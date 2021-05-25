@@ -1,0 +1,19 @@
+[package]
+authors = ["Pooya Eimandar <pooya.eimandar@gmail.com>"]
+edition = "2018"
+name = "activemq-rs"
+version = "0.1.0"
+
+[lib]
+crate-type = ["rlib"] #, "cdylib", "staticlib"] 
+name = "activemq_rs"
+path = "src/lib.rs"
+
+[dependencies]
+cxx = "1.0"
+
+[build-dependencies]
+cxx-build = "1.0"
+
+#in windows
+#build activemq-cpp with /MD for Debug and Release modes
