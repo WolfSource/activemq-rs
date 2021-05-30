@@ -381,7 +381,7 @@ namespace amq
         }
     }
 
-    void producer_consumer::set_user_name(rust::str p) const
+    void producer_consumer::set_username(rust::str p) const
     {
         if (this->conn_type == amq_connection_type::AMQ_CONSUMER)
         {

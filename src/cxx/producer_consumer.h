@@ -23,7 +23,7 @@ namespace amq
         amq_connection_type get_connection_type() const { return this->conn_type; }
 
         void set_broker_uri(rust::str p) const;
-        void set_user_name(rust::str p) const;
+        void set_username(rust::str p) const;
         void set_password(rust::str p) const;
         void set_queue_or_topic_name(rust::str p) const;
         void set_pipeline_type(amq_pipeline_type p) const;

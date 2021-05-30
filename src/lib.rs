@@ -31,7 +31,7 @@ pub mod amq {
         pub fn get_last_error(&self) -> &str;
 
         pub fn set_broker_uri(&self, p: &str) -> ();
-        pub fn set_user_name(&self, p: &str) -> ();
+        pub fn set_username(&self, p: &str) -> ();
         pub fn set_password(&self, p: &str) -> ();
         pub fn set_queue_or_topic_name(&self, p: &str) -> ();
         pub fn set_pipeline_type(&self, p: amq_pipeline_type) -> ();
@@ -45,9 +45,14 @@ pub mod amq {
 
 pub type AmqObj = cxx::UniquePtr<amq::producer_consumer>;
 
+fn fn_callback(str: String) -> () {
+    println!("{}", str);
+}
+
 #[test]
 fn tests() -> () {
     amq::init();
     let _p: AmqObj = amq::new_instance(amq::amq_connection_type::AMQ_CONSUMER);
+    _p.set_on_message_recieved_callback(fn_callback);
     amq::fini();
 }
