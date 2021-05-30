@@ -15,4 +15,5 @@ features = ["napi-6"]
 
 [dependencies]
 cxx = "1.0"
+lazy_static = "1.4.0"
 activemq-rs =   { path = "../" }
