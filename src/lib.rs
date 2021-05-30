@@ -43,9 +43,11 @@ pub mod amq {
     }
 }
 
+pub type AmqObj = cxx::UniquePtr<amq::producer_consumer>;
+
 #[test]
 fn tests() -> () {
     amq::init();
-    let _p = amq::new_instance(amq::amq_connection_type::AMQ_CONSUMER);
+    let _p: AmqObj = amq::new_instance(amq::amq_connection_type::AMQ_CONSUMER);
     amq::fini();
 }
