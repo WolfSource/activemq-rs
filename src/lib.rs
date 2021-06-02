@@ -45,14 +45,14 @@ pub mod amq {
 
 pub type AmqObj = cxx::UniquePtr<amq::producer_consumer>;
 
-fn fn_callback(str: String) -> () {
-    println!("{}", str);
-}
+// fn fn_callback(str: String) -> () {
+//     println!("{}", str);
+// }
 
 #[test]
 fn tests() -> () {
     amq::init();
     let _p: AmqObj = amq::new_instance(amq::amq_connection_type::AMQ_CONSUMER);
-    _p.set_on_message_recieved_callback(fn_callback);
+    //_p.set_on_message_recieved_callback(fn_callback);
     amq::fini();
 }

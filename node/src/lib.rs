@@ -7,7 +7,7 @@ use std::sync::Mutex;
 
 struct AMQNode {
     ptr: activemq_rs::AmqObj,
-    callback: Option<JsFunction>,
+    //callback: Option<JsFunction>,
 }
 
 impl Finalize for AMQNode {}
@@ -47,8 +47,7 @@ fn new_instance(mut cx: FunctionContext) -> JsResult<JsNumber> {
     //create an amq instance, then box it
     let ins = activemq_rs::amq::new_instance(conn_type);
     let amq = AMQNode {
-        ptr: ins,
-        callback: None,
+        ptr: ins, //callback: None,
     };
 
     // lock the mutex and insert this activemq to it
@@ -297,38 +296,41 @@ pub fn set_session_transacted_mode(mut cx: FunctionContext) -> JsResult<JsBoolea
     Ok(cx.boolean(done))
 }
 
-pub fn set_on_message_recieved_callback(mut cx: FunctionContext) -> JsResult<JsBoolean> {
-    // done
-    let done: bool;
-    // get unique index from argument
-    let index = cx.argument::<JsNumber>(0)?.value(&mut cx) as i32;
-    let callback = cx.argument::<JsFunction>(1)?;
+// pub fn set_on_message_recieved_callback(mut cx: FunctionContext) -> JsResult<JsBoolean> {
+//     // done
+//     let done: bool;
+//     // get unique index from argument
+//     let index = cx.argument::<JsNumber>(0)?.value(&mut cx) as i32;
+//     let callback = cx.argument::<JsFunction>(1)?;
 
-    let map = MAPS.lock().unwrap();
-    match map.get(&index) {
-        Some(node) => {
-            // f.call(&mut cx, null, args)?
-            //     .downcast::<JsNumber>()
-            //     .or_throw(&mut cx);
+//     let map = MAPS.lock().unwrap();
+//     match map.get(&index) {
+//         Some(node) => {
+//             let args: Vec<Handle<JsNumber>> = vec![cx.number(16.0)];
+//             let null = cx.null();
+//             callback
+//                 .call(&mut cx, null, args)?
+//                 .downcast::<JsNumber, _>(&mut cx)
+//                 .or_throw(&mut cx);
 
-            //let null = cx.null();
-            //let arg = cx.null();
-            //callback.call(&mut cx, null, arg)?;
-            // node.ptr.set_on_message_recieved_callback(|x| -> () {
-            //     //let arg = String::from("hello");
-            //     let null = cx.null();
-            //     callback.call(&mut cx, null)?;
-            //     println!("{}", x);
-            // });
-            done = true;
-        }
-        _ => {
-            done = false;
-        }
-    }
+//             //let null = cx.null();
+//             //let arg = cx.null();
+//             //callback.call(&mut cx, null, arg)?;
+//             // node.ptr.set_on_message_recieved_callback(|x| -> () {
+//             //     //let arg = String::from("hello");
+//             //     let null = cx.null();
+//             //     callback.call(&mut cx, null)?;
+//             //     println!("{}", x);
+//             // });
+//             done = true;
+//         }
+//         _ => {
+//             done = false;
+//         }
+//     }
 
-    Ok(cx.boolean(done))
-}
+//     Ok(cx.boolean(done))
+// }
 
 #[neon::main]
 fn main(mut cx: ModuleContext) -> NeonResult<()> {
@@ -346,9 +348,9 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("set_pipeline_type", set_pipeline_type)?;
     cx.export_function("set_delivery_mode", set_delivery_mode)?;
     cx.export_function("set_session_transacted_mode", set_session_transacted_mode)?;
-    cx.export_function(
-        "set_on_message_recieved_callback",
-        set_on_message_recieved_callback,
-    )?;
+    // cx.export_function(
+    //     "set_on_message_recieved_callback",
+    //     set_on_message_recieved_callback,
+    // )?;
     Ok(())
 }
