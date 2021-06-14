@@ -25,15 +25,15 @@ pub mod amq {
         type producer_consumer; //for class
 
         pub fn run(&self) -> ();
-        pub fn send_message(&self, pMessage: &str, pPriority: i32) -> ();
+        pub fn send_message(&self, pMessage: String, pPriority: i32) -> ();
         pub fn close(&self) -> ();
 
-        pub fn get_last_error(&self) -> &str;
+        pub fn get_last_error(&self) -> String;
 
-        pub fn set_broker_uri(&self, p: &str) -> ();
-        pub fn set_username(&self, p: &str) -> ();
-        pub fn set_password(&self, p: &str) -> ();
-        pub fn set_queue_or_topic_name(&self, p: &str) -> ();
+        pub fn set_broker_uri(&self, p: String) -> ();
+        pub fn set_username(&self, p: String) -> ();
+        pub fn set_password(&self, p: String) -> ();
+        pub fn set_queue_or_topic_name(&self, p: String) -> ();
         pub fn set_pipeline_type(&self, p: amq_pipeline_type) -> ();
         pub fn set_delivery_mode(&self, p: amq_delivery_mode) -> ();
         pub fn set_session_transacted_mode(&self, p: bool) -> ();

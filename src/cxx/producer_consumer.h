@@ -16,16 +16,16 @@ namespace amq
         virtual ~producer_consumer();
 
         void run() const;
-        void send_message(rust::str pMsg, int32_t pPriority) const;
+        void send_message(rust::String pMsg, int32_t pPriority) const;
         void close() const;
 
-        rust::str get_last_error() const;
+        rust::String get_last_error() const;
         amq_connection_type get_connection_type() const { return this->conn_type; }
 
-        void set_broker_uri(rust::str p) const;
-        void set_username(rust::str p) const;
-        void set_password(rust::str p) const;
-        void set_queue_or_topic_name(rust::str p) const;
+        void set_broker_uri(rust::String p) const;
+        void set_username(rust::String p) const;
+        void set_password(rust::String p) const;
+        void set_queue_or_topic_name(rust::String p) const;
         void set_pipeline_type(amq_pipeline_type p) const;
         void set_delivery_mode(amq_delivery_mode p) const;
         void set_session_transacted_mode(bool p) const;

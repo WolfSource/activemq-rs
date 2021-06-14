@@ -24,12 +24,12 @@ namespace amq
                 }
 
                 auto _connection_factory =
-                    ConnectionFactory::createCMSConnectionFactory(this->broker_uri);
+                    ConnectionFactory::createCMSConnectionFactory(this->broker_uri.data());
 
                 //Create a Connection
                 this->connection = _connection_factory->createConnection(
-                    this->username,
-                    this->password);
+                    this->username.data(),
+                    this->password.data());
                 this->connection->start();
                 this->connection->setExceptionListener(this);
 
@@ -50,7 +50,7 @@ namespace amq
                     {
                         throw CMSException("queue name was not provided");
                     }
-                    this->destination = this->session->createQueue(this->queue_or_topic_name);
+                    this->destination = this->session->createQueue(this->queue_or_topic_name.data());
                 }
                 else
                 {
@@ -58,7 +58,7 @@ namespace amq
                     {
                         throw CMSException("topic name was not provided");
                     }
-                    this->destination = this->session->createTopic(this->queue_or_topic_name);
+                    this->destination = this->session->createTopic(this->queue_or_topic_name.data());
                 }
 
                 // Create a MessageProducer from the Session to the Topic or Queue
@@ -86,10 +86,10 @@ namespace amq
                 auto _text_message = dynamic_cast<const TextMessage *>(pMessage);
                 if (_text_message)
                 {
-                    if (on_message_callback)
+                    //if (on_message_callback)
                     {
-                        rust::string _msg = _text_message->getText();
-                        (*on_message_callback)(_msg);
+                        rust::String _msg = _text_message->getText();
+                        (on_message_callback)(_msg);
                     }
                 }
                 else
@@ -150,19 +150,19 @@ namespace amq
             }
         }
 
-        std::string last_error;
+        rust::String last_error;
         cms::Connection *connection = nullptr;
         cms::Session *session = nullptr;
         cms::Destination *destination = nullptr;
         cms::MessageConsumer *consumer = nullptr;
-        std::string broker_uri;
-        std::string username;
-        std::string password;
-        std::string queue_or_topic_name;
+        rust::String broker_uri;
+        rust::String username;
+        rust::String password;
+        rust::String queue_or_topic_name;
         amq_pipeline_type pipeline_type = amq_pipeline_type::AMQ_QUEUE;
         amq_delivery_mode delivery_mode = amq_delivery_mode::AMQ_PERSISTENT;
         bool session_transacted = false;
-        rust::Fn<void(rust::string)> *on_message_callback = nullptr;
+        rust::Fn<void(rust::String)> on_message_callback;
 
     private:
         //registered as an ExceptionListener with the connection.
@@ -193,12 +193,12 @@ namespace amq
                 }
 
                 auto _connection_factory =
-                    ConnectionFactory::createCMSConnectionFactory(this->broker_uri);
+                    ConnectionFactory::createCMSConnectionFactory(this->broker_uri.data());
 
                 //Create a Connection
                 this->connection = _connection_factory->createConnection(
-                    this->username,
-                    this->password);
+                    this->username.data(),
+                    this->password.data());
                 this->connection->start();
 
                 // Create a Session
@@ -218,7 +218,7 @@ namespace amq
                     {
                         throw CMSException("queue name was not provided");
                     }
-                    this->destination = this->session->createQueue(this->queue_or_topic_name);
+                    this->destination = this->session->createQueue(this->queue_or_topic_name.data());
                 }
                 else
                 {
@@ -226,7 +226,7 @@ namespace amq
                     {
                         throw CMSException("topic name was not provided");
                     }
-                    this->destination = this->session->createTopic(this->queue_or_topic_name);
+                    this->destination = this->session->createTopic(this->queue_or_topic_name.data());
                 }
 
                 // Create a MessageProducer from the Session to the Topic or Queue
@@ -246,12 +246,13 @@ namespace amq
             }
         }
 
-        void send_message(rust::str pMessage, int pPriority)
+        void send_message(rust::String pMessage, int pPriority)
         {
             //make a copy from this message
             if (!pMessage.empty())
             {
-                auto _message = this->session->createTextMessage(pMessage.data());
+                std::string _msg = std::string(pMessage.c_str());
+                auto _message = this->session->createTextMessage(_msg);
                 _message->setIntProperty("Integer", pPriority);
                 this->producer->send(_message);
             }
@@ -298,15 +299,15 @@ namespace amq
             }
         }
 
-        std::string last_error;
+        rust::String last_error;
         cms::Connection *connection;
         cms::Session *session;
         cms::Destination *destination;
         cms::MessageProducer *producer;
-        std::string broker_uri;
-        std::string username;
-        std::string password;
-        std::string queue_or_topic_name;
+        rust::String broker_uri;
+        rust::String username;
+        rust::String password;
+        rust::String queue_or_topic_name;
         amq_pipeline_type pipeline_type;
         amq_delivery_mode delivery_mode;
         bool session_transacted;
@@ -350,7 +351,7 @@ namespace amq
         (this->conn_type == amq_connection_type::AMQ_CONSUMER) ? c_impl->run() : p_impl->run();
     }
 
-    void producer_consumer::send_message(rust::str pMessage, int pPriority) const
+    void producer_consumer::send_message(rust::String pMessage, int pPriority) const
     {
         if (this->conn_type == amq_connection_type::AMQ_PRODUCER)
         {
@@ -363,57 +364,56 @@ namespace amq
         (this->conn_type == amq_connection_type::AMQ_CONSUMER) ? c_impl->close() : p_impl->close();
     }
 
-    rust::str producer_consumer::get_last_error() const
+    rust::String producer_consumer::get_last_error() const
     {
-        return rust::str(
-            (this->conn_type == amq_connection_type::AMQ_CONSUMER) ? c_impl->last_error.data() : p_impl->last_error.data());
+        return (this->conn_type == amq_connection_type::AMQ_CONSUMER) ? c_impl->last_error : p_impl->last_error;
     }
 
-    void producer_consumer::set_broker_uri(rust::str p) const
+    void producer_consumer::set_broker_uri(rust::String p) const
     {
         if (this->conn_type == amq_connection_type::AMQ_CONSUMER)
         {
-            c_impl->broker_uri = p.data();
+            c_impl->broker_uri = p;
         }
         else
         {
-            p_impl->broker_uri = p.data();
+            p_impl->broker_uri = p;
         }
     }
 
-    void producer_consumer::set_username(rust::str p) const
+    void producer_consumer::set_username(rust::String p) const
     {
         if (this->conn_type == amq_connection_type::AMQ_CONSUMER)
         {
-            c_impl->username = p.data();
+            c_impl->username = p;
         }
         else
         {
-            p_impl->username = p.data();
+            p_impl->username = p;
         }
     }
 
-    void producer_consumer::set_password(rust::str p) const
+    void producer_consumer::set_password(rust::String p) const
     {
         if (this->conn_type == amq_connection_type::AMQ_CONSUMER)
         {
-            c_impl->password = p.data();
+            c_impl->password = p;
         }
         else
         {
-            p_impl->password = p.data();
+            p_impl->password = p;
         }
     }
 
-    void producer_consumer::set_queue_or_topic_name(rust::str p) const
+    void producer_consumer::set_queue_or_topic_name(rust::String p) const
     {
         if (this->conn_type == amq_connection_type::AMQ_CONSUMER)
         {
-            c_impl->queue_or_topic_name = p.data();
+            c_impl->queue_or_topic_name = p;
         }
         else
         {
-            p_impl->queue_or_topic_name = p.data();
+            p_impl->queue_or_topic_name = p;
         }
     }
 
@@ -453,11 +453,11 @@ namespace amq
         }
     }
 
-    void producer_consumer::set_on_message_recieved_callback(rust::Fn<void(rust::string)> pFN) const
+    void producer_consumer::set_on_message_recieved_callback(rust::Fn<void(rust::String)> pFN) const
     {
         if (this->conn_type == amq_connection_type::AMQ_CONSUMER)
         {
-            c_impl->on_message_callback = &pFN;
+            c_impl->on_message_callback = pFN;
         }
     }
 
